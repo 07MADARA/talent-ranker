@@ -1,0 +1,49 @@
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "JOYBOY_07"  
+
+primary_contact:
+  name: "Kukkuluri Siva Kumar"
+  email: "sivakukkuluri82@gmail.com"   # Fill this in
+  phone: "+91-6281799856"           # Fill this in
+
+team_members:
+  - name: "Kukkuluri Siva Kumar"
+    email: "sivakukkuluri82@gmail.com"
+    role: "AI Engineer"
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/07MADARA/talent-ranker"
+
+sandbox_link: "https://your-app-link.streamlit.app/" # Update after deploying
+
+reproduce_command: "python rank.py"
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+ai_tools_used:
+  - "Used Google Gemini for architectural brainstorming, trap-detection logic formulation, and UI/UX Streamlit design generation."
+
+# ============================================================================
+# Approach summary
+# ============================================================================
+methodology_summary: |
+  We engineered a Multi-Stage Cascading Pipeline optimized for strict CPU latency constraints. 
+  Stage 1 applies deterministic guardrails to eliminate ~80 honeypots and keyword-stuffers (e.g., catching Marketing Managers with AI keywords). 
+  Stage 2 uses lightweight TF-IDF semantic vectorization to match candidates' actual career histories against the true intent of the JD, bypassing superficial keyword reliance. 
+  Stage 3 applies a mathematical Behavioral Multiplier, penalizing candidates with low recruiter response rates or high platform inactivity based on Redrob signals.
+  Runtime is well under the 5-minute CPU limit, packaged in a glassmorphic Streamlit Command Center UI.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true        
+  code_is_original_work: true       
+  no_collusion: true                
+  honeypot_check_done: true        
+  reproduction_tested: true
