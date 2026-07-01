@@ -199,8 +199,13 @@ def main():
     
     final_output = top_100[['candidate_id', 'rank', 'score', 'reasoning']]
     
-    print(f"5. Saving submission to {OUTPUT_PATH}...")
+    print(f"5. Saving submission to {OUTPUT_PATH} and Excel...")
+    # Save the CSV for the validator script
     final_output.to_csv(OUTPUT_PATH, index=False, encoding='utf-8')
+    
+    # Save the XLSX for the submission portal
+    excel_path = OUTPUT_PATH.replace('.csv', '.xlsx')
+    final_output.to_excel(excel_path, index=False)
     print("✅ Run complete. System ready.")
 
 if __name__ == "__main__":
