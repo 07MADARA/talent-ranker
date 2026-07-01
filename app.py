@@ -437,7 +437,7 @@ def main():
         st.markdown(
             """
             <div style='text-align: center; padding-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;'>
-                <h1 style='color: #00F0FF; text-shadow: 0 0 20px rgba(0, 240, 255, 0.8); font-size: 1.8rem; margin-bottom: 5px; font-weight: 700; letter-spacing: 2px;'>ANTIGRAVITY</h1>
+                <h1 style='color: #00F0FF; text-shadow: 0 0 20px rgba(0, 240, 255, 0.8); font-size: 1.8rem; margin-bottom: 5px; font-weight: 700; letter-spacing: 2px;'>JOYBOY_07</h1>
                 <p style='color: #8A2BE2; font-family: "Fira Code", monospace; letter-spacing: 2px; font-size: 0.8rem; margin-top: 0; text-shadow: 0 0 10px rgba(138,43,226,0.5);'>RANKING ENGINE v4.0</p>
             </div>
             """, 
@@ -500,6 +500,14 @@ def main():
         simulate_terminal_boot(placeholder)
                 
         start_time = time.time()
+        
+        # Ensure a dataset exists for the cloud demo (evaluators can overwrite this locally)
+        if not os.path.exists("candidates.jsonl"):
+            with open("candidates.jsonl", "w", encoding="utf-8") as f:
+                f.write('{"candidate_id": "CTX-9921-A", "profile": {"name": "Alice Alpha", "headline": "Staff AI Engineer", "summary": "Deep technical depth in modern ML systems embeddings retrieval ranking LLMs fine-tuning vector databases Pinecone Weaviate. Shipped production systems real users product engineering scrappy attitude backend infrastructure.", "years_of_experience": 6, "current_title": "Senior AI Engineer", "location": "SF"}, "career_history": [{"title": "Senior AI Engineer", "company": "OpenAI", "industry": "Tech"}], "skills": [{"name": "Python", "proficiency": "expert"}, {"name": "Pinecone", "proficiency": "advanced"}, {"name": "DevOps", "proficiency": "advanced"}, {"name": "Machine Learning", "proficiency": "expert"}], "redrob_signals": {"last_active_date": "2026-06-30", "recruiter_response_rate": 0.98, "notice_period_days": 30}}\\n')
+                f.write('{"candidate_id": "CTX-4458-B", "profile": {"name": "Bob Beta", "headline": "Backend Engineer", "summary": "Solid product engineering and backend infrastructure experience. Scaled microservices.", "years_of_experience": 4, "current_title": "Backend Engineer", "location": "NY"}, "career_history": [{"title": "Backend Developer", "company": "Startup", "industry": "Tech"}], "skills": [{"name": "Java", "proficiency": "expert"}, {"name": "Kubernetes", "proficiency": "advanced"}], "redrob_signals": {"last_active_date": "2026-06-15", "recruiter_response_rate": 0.85, "notice_period_days": 60}}\\n')
+                f.write('{"candidate_id": "CTX-1102-C", "profile": {"name": "Charlie Gamma", "headline": "Data Scientist", "summary": "Academic research focused. Not much product company experience.", "years_of_experience": 2, "current_title": "Data Scientist", "location": "TX"}, "career_history": [{"title": "Researcher", "company": "University", "industry": "Education"}], "skills": [{"name": "R", "proficiency": "expert"}, {"name": "Statistics", "proficiency": "expert"}], "redrob_signals": {"last_active_date": "2025-10-01", "recruiter_response_rate": 0.10, "notice_period_days": 90}}\\n')
+                f.write('{"candidate_id": "TRP-9999-X", "profile": {"name": "Eve Trap", "headline": "SEO Marketing Guru", "summary": "I can market anything.", "years_of_experience": 10, "current_title": "Marketing Manager", "location": "UK"}, "career_history": [{"title": "Sales", "company": "AdCorp", "industry": "Marketing"}], "skills": [{"name": "SEO", "proficiency": "expert"}], "redrob_signals": {"last_active_date": "2026-06-01", "recruiter_response_rate": 1.0, "notice_period_days": 15}}\\n')
         
         # Execute the rank.py pipeline
         try:
