@@ -525,10 +525,11 @@ def main():
                 final_df['reasoning'] = final_df.apply(rank.generate_reasoning, axis=1)
                 final_df = final_df.sort_values(by=['final_score', 'candidate_id'], ascending=[False, True])
                 
-                # Save physical files silently
-                final_df['rank'] = range(1, len(final_df) + 1)
-                final_df['score'] = final_df['final_score'].round(4)
-                output_csv = final_df[['candidate_id', 'rank', 'score', 'reasoning']]
+                # Save physical files silently (Top 100 only per validation spec)
+                top_100 = final_df.head(100).copy()
+                top_100['rank'] = range(1, len(top_100) + 1)
+                top_100['score'] = top_100['final_score'].round(4)
+                output_csv = top_100[['candidate_id', 'rank', 'score', 'reasoning']]
                 output_csv.to_csv("team_antigravity.csv", index=False, encoding='utf-8')
                 try:
                     output_csv.to_excel("team_antigravity.xlsx", index=False)
