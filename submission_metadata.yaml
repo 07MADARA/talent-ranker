@@ -18,7 +18,7 @@ team_members:
 # ============================================================================
 github_repo: "https://github.com/07MADARA/talent-ranker"
 
-sandbox_link: "https://your-app-link.streamlit.app/" # Update after deploying
+sandbox_link: "https://talent-ranker-dxmhdh6vijjjv6rwdmp99a.streamlit.app/"
 
 reproduce_command: "python rank.py"
 
