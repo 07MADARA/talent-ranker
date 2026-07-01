@@ -2,6 +2,8 @@
 *.jsonl
 *.gz
 *.csv
+*.xlsx
+team_antigravity.*
 
 # Exclude python cache
 __pycache__/
