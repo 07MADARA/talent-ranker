@@ -1,6 +1,6 @@
-# Antigravity Ranker | Intelligent Candidate Discovery
+# JOYBOY_07 Ranker | Intelligent Candidate Discovery
 
-This repository contains the **Antigravity Ranker**, a multi-stage cascading pipeline engineered for the Redrob Talent Intelligence Challenge. 
+This repository contains the **JOYBOY_07 Ranker**, a multi-stage cascading pipeline engineered for the Redrob Talent Intelligence Challenge. 
 
 ## 🚀 Live Sandbox
 [Access the Command Center](https://talent-ranker-dxmhdh6vijjjv6rwdmp99a.streamlit.app/)
