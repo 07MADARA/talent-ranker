@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import time
 import json
 import rank
+import os
 
 # ==========================================
 # PAGE CONFIGURATION
@@ -24,7 +25,7 @@ def inject_custom_css():
         """
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&display=swap');
         
         /* Global Font and Background */
         html, body, [class*="css"] {
@@ -49,9 +50,9 @@ def inject_custom_css():
             border-right: 1px solid rgba(138, 43, 226, 0.3) !important;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
+            box-shadow: 2px 0 15px rgba(138, 43, 226, 0.1);
         }
         
-        /* Sidebar text color adjustments */
         [data-testid="stSidebar"] * {
             color: #E2E8F0 !important;
         }
@@ -79,11 +80,29 @@ def inject_custom_css():
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
             height: 100%;
+            position: relative;
+            overflow: hidden;
         }
+        /* Scanning line animation */
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(0,240,255,0.1) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-20deg);
+            animation: scan 4s infinite;
+        }
+        @keyframes scan {
+            0% { left: -100%; }
+            50% { left: 200%; }
+            100% { left: 200%; }
+        }
+        
         .metric-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 240, 255, 0.15);
-            border: 1px solid rgba(0, 240, 255, 0.4);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 240, 255, 0.2);
+            border: 1px solid rgba(0, 240, 255, 0.6);
         }
         .metric-title {
             font-size: 0.85rem;
@@ -100,15 +119,14 @@ def inject_custom_css():
             background: -webkit-linear-gradient(45deg, #00F0FF, #8A2BE2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0px 0px 20px rgba(0, 240, 255, 0.2);
+            text-shadow: 0px 0px 20px rgba(0, 240, 255, 0.3);
         }
         
-        /* Custom styles for specific metric values */
         .value-green {
             background: none !important;
             color: #00FF00 !important;
             -webkit-text-fill-color: #00FF00 !important;
-            text-shadow: 0px 0px 20px rgba(0, 255, 0, 0.3) !important;
+            text-shadow: 0px 0px 20px rgba(0, 255, 0, 0.4) !important;
         }
         .value-dim {
             background: none !important;
@@ -130,9 +148,10 @@ def inject_custom_css():
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .dossier-card:hover {
-            background: rgba(30, 41, 59, 0.85);
+            background: rgba(30, 41, 59, 0.9);
             border-left: 4px solid #8A2BE2;
-            box-shadow: 0 8px 30px rgba(138, 43, 226, 0.15);
+            box-shadow: 0 8px 30px rgba(138, 43, 226, 0.3);
+            transform: scale(1.01);
         }
         .candidate-header {
             display: flex;
@@ -155,14 +174,15 @@ def inject_custom_css():
             background: rgba(0, 240, 255, 0.1);
             padding: 6px 10px;
             border-radius: 4px;
-            border: 1px solid rgba(0, 240, 255, 0.2);
+            border: 1px solid rgba(0, 240, 255, 0.3);
             letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
         }
         
         /* AI Verdict Blockquote */
         .ai-verdict {
             border-left: 3px solid #8A2BE2;
-            background: linear-gradient(90deg, rgba(138, 43, 226, 0.1) 0%, rgba(138, 43, 226, 0.02) 100%);
+            background: linear-gradient(90deg, rgba(138, 43, 226, 0.15) 0%, rgba(138, 43, 226, 0.02) 100%);
             padding: 16px 20px;
             border-radius: 0 8px 8px 0;
             font-style: italic;
@@ -175,9 +195,9 @@ def inject_custom_css():
         .ai-verdict-label {
             font-family: 'Fira Code', monospace;
             color: #8A2BE2;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.8rem;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             margin-bottom: 8px;
             font-style: normal;
@@ -198,18 +218,36 @@ def inject_custom_css():
             width: 100% !important;
         }
         .stButton > button:hover {
-            box-shadow: 0 0 25px rgba(138, 43, 226, 0.6) !important;
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.8) !important;
             transform: translateY(-2px) !important;
         }
         .stButton > button:active {
             transform: translateY(1px) !important;
         }
         
+        /* Secondary Download Buttons */
+        [data-testid="stDownloadButton"] > button {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(0, 240, 255, 0.4) !important;
+            color: #00F0FF !important;
+            box-shadow: none !important;
+        }
+        [data-testid="stDownloadButton"] > button:hover {
+            background: rgba(0, 240, 255, 0.1) !important;
+            border: 1px solid rgba(0, 240, 255, 0.8) !important;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3) !important;
+        }
+
         /* Expanders */
         .streamlit-expanderHeader {
-            background-color: rgba(255, 255, 255, 0.02) !important;
+            background-color: rgba(255, 255, 255, 0.03) !important;
             border-radius: 6px !important;
-            border: 1px solid rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            transition: all 0.3s;
+        }
+        .streamlit-expanderHeader:hover {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(0, 240, 255, 0.3) !important;
         }
         .streamlit-expanderHeader p {
             color: #00F0FF !important;
@@ -217,7 +255,7 @@ def inject_custom_css():
             letter-spacing: 0.5px !important;
         }
         .streamlit-expanderContent {
-            background-color: rgba(0, 0, 0, 0.2) !important;
+            background-color: rgba(0, 0, 0, 0.3) !important;
             border: 1px solid rgba(255,255,255,0.05) !important;
             border-top: none !important;
             border-radius: 0 0 6px 6px !important;
@@ -232,6 +270,22 @@ def inject_custom_css():
         .stProgress > div > div > div {
             background-color: #00F0FF !important;
             box-shadow: 0 0 10px #00F0FF !important;
+        }
+        
+        /* Terminal Text Animation */
+        .terminal-text {
+            font-family: 'Fira Code', monospace;
+            color: #00F0FF;
+            font-size: 1rem;
+            margin: 5px 0;
+            text-align: left;
+        }
+        .terminal-container {
+            background: #000;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.1);
         }
         </style>
         """,
@@ -301,58 +355,31 @@ def process_real_candidates(df):
 def create_radar_chart(skills):
     categories = list(skills.keys())
     values = list(skills.values())
-    
-    # Close the loop
     categories.append(categories[0])
     values.append(values[0])
     
     fig = go.Figure(
         data=[
             go.Scatterpolar(
-                r=values,
-                theta=categories,
-                fill='toself',
-                fillcolor='rgba(0, 240, 255, 0.15)',
-                line=dict(color='#00F0FF', width=2),
-                marker=dict(color='#00F0FF', size=6, symbol='circle'),
-                name='Candidate Profile'
+                r=values, theta=categories, fill='toself', fillcolor='rgba(0, 240, 255, 0.2)',
+                line=dict(color='#00F0FF', width=2), marker=dict(color='#00F0FF', size=6, symbol='circle'), name='Candidate Profile'
             ),
             go.Scatterpolar(
-                r=[90, 85, 80, 85, 90], # Ideal profile mock
-                theta=categories,
-                fill='none',
-                line=dict(color='rgba(138, 43, 226, 0.6)', width=2, dash='dash'),
-                name='Ideal JD Profile'
+                r=[90, 85, 80, 85, 90], theta=categories, fill='none',
+                line=dict(color='rgba(138, 43, 226, 0.8)', width=2, dash='dash'), name='Ideal JD Profile'
             )
         ]
     )
     
     fig.update_layout(
         polar=dict(
-            radialaxis=dict(
-                visible=True, 
-                range=[0, 100], 
-                gridcolor='rgba(255, 255, 255, 0.1)', 
-                tickfont=dict(color='#64748B'),
-                showline=False
-            ),
-            angularaxis=dict(
-                gridcolor='rgba(255, 255, 255, 0.1)', 
-                tickfont=dict(color='#E2E8F0', size=12, family='Inter')
-            ),
+            radialaxis=dict(visible=True, range=[0, 100], gridcolor='rgba(255, 255, 255, 0.15)', tickfont=dict(color='#64748B'), showline=False),
+            angularaxis=dict(gridcolor='rgba(255, 255, 255, 0.15)', tickfont=dict(color='#E2E8F0', size=12, family='Inter')),
             bgcolor='rgba(0,0,0,0)'
         ),
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        showlegend=False,
-        margin=dict(l=40, r=40, t=30, b=30),
-        height=260,
-        title=dict(
-            text="Technical Depth Matrix",
-            font=dict(color="#94A3B8", size=13, family="Inter"),
-            x=0.5,
-            y=0.98
-        )
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', showlegend=False,
+        margin=dict(l=40, r=40, t=30, b=30), height=260,
+        title=dict(text="Technical Depth Matrix", font=dict(color="#94A3B8", size=13, family="Inter"), x=0.5, y=0.98)
     )
     return fig
 
@@ -360,13 +387,11 @@ def create_gauge_chart(score):
     color = "#00FF00" if score >= 90 else "#FFD700" if score >= 70 else "#FF4500"
     
     fig = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = score,
-        domain = {'x': [0, 1], 'y': [0, 1]},
+        mode = "gauge+number", value = score, domain = {'x': [0, 1], 'y': [0, 1]},
         title = {'text': "AI Match Confidence", 'font': {'color': '#94A3B8', 'size': 13, 'family': 'Inter'}},
         number = {'font': {'color': color, 'size': 38, 'family': 'Fira Code'}, 'suffix': "%"},
         gauge = {
-            'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "rgba(255,255,255,0.2)", 'tickfont': {'color': '#64748B'}},
+            'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "rgba(255,255,255,0.3)", 'tickfont': {'color': '#64748B'}},
             'bar': {'color': color, 'thickness': 0.25},
             'bgcolor': "rgba(255, 255, 255, 0.05)",
             'borderwidth': 0,
@@ -375,53 +400,29 @@ def create_gauge_chart(score):
                 {'range': [70, 90], 'color': 'rgba(255, 215, 0, 0.15)'},
                 {'range': [90, 100], 'color': 'rgba(0, 255, 0, 0.15)'}
             ],
-            'threshold': {
-                'line': {'color': "rgba(255,255,255,0.8)", 'width': 2},
-                'thickness': 0.75,
-                'value': 90
-            }
+            'threshold': {'line': {'color': "rgba(255,255,255,0.8)", 'width': 2}, 'thickness': 0.75, 'value': 90}
         }
     ))
     
-    fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        height=200,
-        margin=dict(l=20, r=20, t=40, b=20)
-    )
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=200, margin=dict(l=20, r=20, t=40, b=20))
     return fig
 
-def create_behavioral_heatmap(behavioral_data):
-    z_data = [[behavioral_data.get('Response Rate', 80), behavioral_data.get('Commit Freq', 70)],
-              [behavioral_data.get('Peer Reviews', 75), np.random.randint(60, 95)]]
-    
-    fig = go.Figure(data=go.Heatmap(
-        z=z_data,
-        x=['Wk 1', 'Wk 2'],
-        y=['Comm', 'Code'],
-        colorscale='Purp',
-        showscale=False,
-        hoverinfo='z',
-        text=[[str(val) for val in row] for row in z_data],
-        texttemplate="%{text}",
-        textfont={"size": 12, "color": "white"}
-    ))
-    
-    fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=40, r=10, t=30, b=30),
-        height=180,
-        xaxis=dict(gridcolor='rgba(255,255,255,0.05)', tickfont=dict(color='#94A3B8')),
-        yaxis=dict(gridcolor='rgba(255,255,255,0.05)', tickfont=dict(color='#94A3B8')),
-        title=dict(
-            text="Behavioral Velocity",
-            font=dict(color="#94A3B8", size=13, family="Inter"),
-            x=0.5,
-            y=0.98
-        )
-    )
-    return fig
+def simulate_terminal_boot(placeholder):
+    lines = [
+        "[+] ESTABLISHING SECURE UPLINK...",
+        "[+] INGESTING CANDIDATE DATASET...",
+        "[+] DEPLOYING TF-IDF VECTORIZATION...",
+        "[+] APPLYING DETERMINISTIC GUARDRAILS...",
+        "[+] COMPUTING BEHAVIORAL MULTIPLIERS...",
+        "[+] RANKING MATRICES SECURED. OUTPUTTING TOP 1%."
+    ]
+    html_content = "<div class='terminal-container'>"
+    for line in lines:
+        html_content += f"<div class='terminal-text'>{line}</div>"
+        placeholder.markdown(html_content + "</div>", unsafe_allow_html=True)
+        time.sleep(0.3)
+    time.sleep(0.5)
+    placeholder.empty()
 
 # ==========================================
 # MAIN APP STRUCTURE
@@ -436,8 +437,8 @@ def main():
         st.markdown(
             """
             <div style='text-align: center; padding-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;'>
-                <h1 style='color: #00F0FF; text-shadow: 0 0 15px rgba(0, 240, 255, 0.6); font-size: 1.8rem; margin-bottom: 5px; font-weight: 700; letter-spacing: 1px;'>ANTIGRAVITY</h1>
-                <p style='color: #8A2BE2; font-family: "Fira Code", monospace; letter-spacing: 2px; font-size: 0.8rem; margin-top: 0;'>RANKING ENGINE v3.0</p>
+                <h1 style='color: #00F0FF; text-shadow: 0 0 20px rgba(0, 240, 255, 0.8); font-size: 1.8rem; margin-bottom: 5px; font-weight: 700; letter-spacing: 2px;'>ANTIGRAVITY</h1>
+                <p style='color: #8A2BE2; font-family: "Fira Code", monospace; letter-spacing: 2px; font-size: 0.8rem; margin-top: 0; text-shadow: 0 0 10px rgba(138,43,226,0.5);'>RANKING ENGINE v4.0</p>
             </div>
             """, 
             unsafe_allow_html=True
@@ -465,8 +466,8 @@ def main():
         
         st.markdown(
             """
-            <div style='position: absolute; bottom: 20px; width: 100%; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.7rem; font-family: "Fira Code", monospace;'>
-                STATUS: SECURE CONNECTION<br>LATENCY: 14ms
+            <div style='position: absolute; bottom: 20px; width: 100%; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.7rem; font-family: "Fira Code", monospace;'>
+                STATUS: SECURE CONNECTION<br>ENCRYPTION: AES-256
             </div>
             """,
             unsafe_allow_html=True
@@ -478,7 +479,7 @@ def main():
     st.markdown(
         """
         <div style='margin-bottom: 30px;'>
-            <h2 style='font-weight: 300; letter-spacing: 2px; color: #F8FAFC; margin-bottom: 5px;'>TALENT INTELLIGENCE <span style='color: #00F0FF; font-weight: 700; text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);'>COMMAND CENTER</span></h2>
+            <h2 style='font-weight: 300; letter-spacing: 2px; color: #F8FAFC; margin-bottom: 5px;'>TALENT INTELLIGENCE <span style='color: #00F0FF; font-weight: 700; text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);'>COMMAND CENTER</span></h2>
             <p style='color: #94A3B8; font-size: 0.95rem;'>Deploying multi-stage AI reasoning to surface top-tier engineering talent.</p>
         </div>
         """, 
@@ -496,14 +497,7 @@ def main():
 
     if initialize:
         placeholder = st.empty()
-        with placeholder.container():
-            st.markdown(
-                """
-                <div style='padding: 40px; text-align: center; background: rgba(0,240,255,0.05); border: 1px dashed rgba(0,240,255,0.3); border-radius: 12px; margin-bottom: 20px;'>
-                    <h3 style='color: #00F0FF; font-family: "Fira Code", monospace; animation: pulse 1.5s infinite;'>INITIALIZING SEMANTIC ENGINE...</h3>
-                    <p style='color: #94A3B8;'>Computing vector embeddings & behavioral multipliers</p>
-                </div>
-                """, unsafe_allow_html=True)
+        simulate_terminal_boot(placeholder)
                 
         start_time = time.time()
         
@@ -523,6 +517,16 @@ def main():
                 final_df['reasoning'] = final_df.apply(rank.generate_reasoning, axis=1)
                 final_df = final_df.sort_values(by=['final_score', 'candidate_id'], ascending=[False, True])
                 
+                # Save physical files silently
+                final_df['rank'] = range(1, len(final_df) + 1)
+                final_df['score'] = final_df['final_score'].round(4)
+                output_csv = final_df[['candidate_id', 'rank', 'score', 'reasoning']]
+                output_csv.to_csv("team_antigravity.csv", index=False, encoding='utf-8')
+                try:
+                    output_csv.to_excel("team_antigravity.xlsx", index=False)
+                except Exception:
+                    pass
+                
                 end_time = time.time()
                 
                 st.session_state.processed = f"{len(raw_df):,}"
@@ -538,8 +542,6 @@ def main():
         except FileNotFoundError:
             st.error("Dataset 'candidates.jsonl' not found.")
             st.session_state.show_results = False
-            
-        placeholder.empty()
 
     m1, m2, m3, m4 = st.columns(4)
     
@@ -576,22 +578,38 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<hr style='border: 0; height: 1px; background-image: linear-gradient(to right, rgba(255,255,255,0), rgba(0, 240, 255, 0.3), rgba(255,255,255,0)); margin: 40px 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border: 0; height: 1px; background-image: linear-gradient(to right, rgba(255,255,255,0), rgba(0, 240, 255, 0.4), rgba(255,255,255,0)); margin: 40px 0;'>", unsafe_allow_html=True)
 
     # ----------------------------------------
     # C. The Candidate Dossiers (The Feed)
     # ----------------------------------------
     if st.session_state.show_results and st.session_state.candidates_data:
-        st.markdown(
-            """
-            <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;'>
-                <h3 style='color: #E2E8F0; font-weight: 600; letter-spacing: 1px; margin: 0;'>RANKED SHORTLIST <span style='color: #8A2BE2; font-size: 0.9rem;'>[ REAL-TIME EVALUATION ]</span></h3>
-                <div style='color: #00F0FF; font-family: "Fira Code", monospace; font-size: 0.85rem;'>SORT BY: AI CONFIDENCE ▼</div>
-            </div>
-            """, 
-            unsafe_allow_html=True
-        )
         
+        col_title, col_btns = st.columns([2, 1])
+        with col_title:
+            st.markdown(
+                """
+                <h3 style='color: #E2E8F0; font-weight: 600; letter-spacing: 1px; margin: 0;'>RANKED SHORTLIST <span style='color: #8A2BE2; font-size: 0.9rem;'>[ REAL-TIME EVALUATION ]</span></h3>
+                """, 
+                unsafe_allow_html=True
+            )
+        
+        with col_btns:
+            # Export Buttons
+            b1, b2 = st.columns(2)
+            try:
+                with open("team_antigravity.csv", "rb") as f:
+                    b1.download_button("💾 DOWNLOAD CSV", f, file_name="team_antigravity.csv", mime="text/csv", use_container_width=True)
+            except FileNotFoundError:
+                pass
+            try:
+                with open("team_antigravity.xlsx", "rb") as f:
+                    b2.download_button("💾 DOWNLOAD XLSX", f, file_name="team_antigravity.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
+            except FileNotFoundError:
+                pass
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
         for cand in st.session_state.candidates_data:
             # Layout for each dossier: Left Info (70%), Right Charts (30%)
             col_info, col_charts = st.columns([2.2, 1.2])
