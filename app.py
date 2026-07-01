@@ -466,7 +466,7 @@ def main():
         
         st.markdown(
             """
-            <div style='position: absolute; bottom: 20px; width: 100%; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.7rem; font-family: "Fira Code", monospace;'>
+            <div style='margin-top: 30px; margin-bottom: 20px; width: 100%; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.7rem; font-family: "Fira Code", monospace;'>
                 STATUS: SECURE CONNECTION<br>ENCRYPTION: AES-256
             </div>
             """,
