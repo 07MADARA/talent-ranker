@@ -1,0 +1,8 @@
+# Exclude data files
+*.jsonl
+*.gz
+*.csv
+
+# Exclude python cache
+__pycache__/
+*.pyc
